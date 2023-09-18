@@ -218,7 +218,5 @@ lighten-1">
     </v-footer>
 
 
-
-
   </v-app>
 </template>

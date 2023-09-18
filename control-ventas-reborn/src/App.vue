@@ -8,7 +8,7 @@
         <v-list-item :to="{ name: 'home' }">
           <v-list-item-action>
             <v-icon>home</v-icon>
-          </v-list-item-action>
+          </v-list-item-action> 
 
           <v-list-item-title>
             Inicio
@@ -207,7 +207,7 @@ lighten-1">
 
     <v-content>
       <h1 class="text-center success--text mt-10">Zona para trabajar el proyecto</h1>
-      <router-view />
+      <router-view /> <!-- Etiqueta para mostrar los componentes del ruteo -->
     </v-content>
 
     <v-footer>
