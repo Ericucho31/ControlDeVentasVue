@@ -1,14 +1,19 @@
-<template>
-    <h1 class="text-center ">Roles</h1>
-</template>
 
-<template>
-  <v-data-table :headers="headers" :items="roles" sort-by="nombreRol" class="elevation-1">
+
+<template v-slot:top>
+  <v-data-table :headers="headers" :items="roles" :search="search"  sort-by="nombreRol" class="elevation-1">
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>Roles</v-toolbar-title>
-        <v-divider class="mx-4" inset vertical></v-divider>
-        <v-spacer></v-spacer>
+        <!---->
+          <v-toolbar-title class="text-center ">Roles</v-toolbar-title>
+          <v-divider class="mx-4" inset-vertical></v-divider>
+          <v-spacer></v-spacer>
+
+          <!--Búsqueda de categorias-->
+          <v-text-field class="text-center" v-model="search" append-icon="search" label="Búsqueda" single-line hide-details></v-text-field>
+          <v-divider class="mx-4" inset-vertical></v-divider>
+          <v-spacer></v-spacer>
+        <!---->
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
@@ -44,6 +49,28 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <v-dialog v-model="adModal" max-width="350px">
+          <v-card>
+            <v-card-title v-if="adAccion==1">¿Activar Rol?</v-card-title>
+            <v-card-title v-if="adAccion==2">¿Desactivar Rol?</v-card-title>
+
+            <v-card-text>
+              Vas a 
+                <span v-if="adAccion==1"> Activar </span>
+                <span v-if="adAccion==2"> Desactivar </span>
+                el rol {{ adNombre }},
+            </v-card-text>
+
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="dark darken-1" @click="ActivarDesactivarCerrar"> Cerrar </v-btn>
+                <v-btn v-if="adAccion==1" color="success darken-1" @click="activar"> Activar </v-btn>
+                <v-btn v-if="adAccion==2" class="white--text" color="red darken-1" @click="desactivar"> Desactivar </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
             <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
@@ -57,14 +84,23 @@
         </v-dialog>
       </v-toolbar>
     </template>
+
     <template v-slot:item.actions="{ item }">
       <v-icon small class="mr-2" @click="editItem(item)">
         mdi-pencil
       </v-icon>
-      <v-icon small @click="deleteItem(item)">
-        mdi-delete
-      </v-icon>
+
+      <!--Íconos de ESTADO-->
+      <template v-if="item.estado">
+        <v-icon medium color="green darker-2" class="mr-2" @click="modalActivarDesactivar(2,item)"> check_circle</v-icon>
+      </template>
+      <template v-else="item.estado">
+        <v-icon medium color="red darker-2" class="mr-2" @click="modalActivarDesactivar(1,item)"> cancel</v-icon>
+      </template>
     </template>
+
+    
+
     <template v-slot:no-data>
       <v-btn color="primary" @click="initialize">
         Reset
@@ -79,8 +115,20 @@ import axios from 'axios'
 
 export default {
   data: () => ({
-
+    search:'',
     roles: [],
+    adModal: 0,
+    adAccion: 0,
+    adNombre: '',
+    adIdRoles: '',
+    dialog: false,
+    dialogDelete: false,
+    headers: [
+      { text: 'Nombre Rol', value: 'nombreRol', align:'start', sortable:true },
+      { text: 'Descripcion Rol', value: 'descripcionRol',sortable:true },
+      { text: 'Accion', value: 'actions', sortable: false },
+    ],
+
     validarRol() {
       this.valida=0;
       this.ValidaMensajes=[];
@@ -94,14 +142,20 @@ export default {
       return this.valida;
     },
 
-    dialog: false,
-    dialogDelete: false,
-    headers: [
-      { text: 'Nombre Rol', value: 'nombreRol', align:'start', sortable:true },
-      { text: 'Descripcion Rol', value: 'descripcionRol',sortable:true },
-      { text: 'Estado', value: 'estado',sortable:true },
-      { text: 'Accion', value: 'actions', sortable: false },
-    ],
+    modalActivarDesactivar(accion, item) {
+      this.adModal = 1;
+      this.adIdRoles = item.idRol;
+      this.adNombre=item.nombreRol;
+
+      if(accion==1) {
+        this.adAccion=1;
+      } else if(accion==2) {
+        this.adAccion=2;
+      } else {
+        this.adAccion=0;
+      }
+      
+    },
     
     editedIndex: -1,
     editedItem: {
@@ -146,6 +200,37 @@ export default {
         ;
     },
 
+    activar () {
+      let me = this;
+      axios.put('api/Roles/ActivarRoles/'+this.adIdRoles,{}).then(function(response) {
+        me.adModal=0;
+        me.adAccion=0;
+        me.adNombre='';
+        me.adIdRoles=0;
+        me.close();
+        me.ListadoRoles();
+      }).catch(function(error) {
+        console.log(error);
+      });
+    },
+
+    desactivar () {
+      let me = this;
+      axios.put('api/Roles/DesactivarRoles/'+this.adIdRoles,{}).then(function(response) {
+        me.adModal=0;
+        me.adAccion=0;
+        me.adNombre='';
+        me.adIdRoles=0;
+        me.close();
+        me.ListadoRoles();
+      }).catch(function(error) {
+        console.log(error);
+      });
+    },
+
+    ActivarDesactivarCerrar () {
+      this.adModal=0;
+    },
 
 
     initialize() {
