@@ -30,19 +30,48 @@ namespace Presentacion.Controllers
         [HttpGet("[action]")]
         public async Task<IEnumerable<ArticulosViewModel>> ListarArticulos()
         {
-            var articulos = await _context.Articulos.ToListAsync();
+            var articulos = await _context.Articulos.Include(a => a.IdCategoriaNavigation).ToListAsync();
             return articulos.Select(a => new ArticulosViewModel
             {
                 IdArticulo = a.IdArticulo,
                 IdCategoria = a.IdCategoria,
+                Categoria = a.IdCategoriaNavigation.NombreCategoria,
                 CodigoArticulo = a.CodigoArticulo,
                 NombreArticulo = a.NombreArticulo,
                 PrecioVenta = a.PrecioVenta,
                 Stock = a.Stock,
                 DescripcionArticulo = a.DescripcionArticulo,
                 Estado = a.Estado
+
+
             });
         }
+
+        // METODO OBTENER (ID) //**********************************************************************************
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> ObtenerArticulo([FromRoute] int id)
+        {
+            var articulo = await _context.Articulos.Include(a => a.IdCategoriaNavigation).SingleOrDefaultAsync(a => a.IdArticulo == id);
+
+            if(articulo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new ArticulosViewModel
+            {
+                IdArticulo = articulo.IdArticulo,
+                IdCategoria = articulo.IdCategoria,
+                CodigoArticulo = articulo.CodigoArticulo,
+                NombreArticulo = articulo.NombreArticulo,
+                PrecioVenta = articulo.PrecioVenta,
+                Stock = articulo.Stock,
+                DescripcionArticulo = articulo.DescripcionArticulo,
+                Estado = articulo.Estado,
+                Categoria = articulo.IdCategoriaNavigation.NombreCategoria
+            });
+        }
+
 
         // GET: api/Articulos
         [HttpGet]

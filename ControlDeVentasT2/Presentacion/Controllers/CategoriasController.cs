@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Datos;
 using Entidades.Alamcen;
 using Presentacion.Models.Almacen.Categoria;
+using Presentacion.Models.Almacen.Articulos;
 
 namespace Presentacion.Controllers
 {
@@ -44,6 +45,19 @@ namespace Presentacion.Controllers
                 NombreCategoria = c.NombreCategoria,
                 Descripcion = c.Descripcion,
                 Estado = c.Estado
+            });
+        }
+
+
+        // METODO SELECCIONAR CATEGORIA  //**********************************************************************************
+        [HttpGet("[action]")]
+        public async Task<IEnumerable<SeleccionarArticuloViewModel>> SeleccionarCategorias()
+        {
+            var categoria = await _context.Categorias.Where(a => a.Estado == true).ToArrayAsync();
+            return categoria.Select(c => new SeleccionarArticuloViewModel
+            {
+                IdCategoria = c.IdCategoria,
+                NombreCategoria = c.NombreCategoria,
             });
         }
 
@@ -172,6 +186,8 @@ namespace Presentacion.Controllers
             }
             return Ok();
         }
+
+
 
         // DELETE: api/Categorias/5
         [HttpDelete("{id}")]

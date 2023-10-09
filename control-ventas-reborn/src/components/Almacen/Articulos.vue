@@ -16,7 +16,7 @@
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Nueva Categoria
+                Nuevo Artículo
               </v-btn>
             </template>
             <v-card>
@@ -28,10 +28,25 @@
                 <v-container>
                   <v-row>
                     <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="nombreCategoria" label="Nombre"></v-text-field>
+                      <v-text-field v-model="idCategoria" label="IdCategoria"></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="codigoArticulo" label="Código"></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="nombreArticulo" label="Nombre"></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="precioVenta" label="Precio de Venta"></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="Stock" label="Stock"></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field v-model="descripcion" label="Descripción"></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field v-model="estado" label="Estado"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -124,8 +139,12 @@
       dialog: false,
       dialogDelete: false,
       headers: [
-        { text: 'Nombre Categoria', value: 'nombreCategoria', align:'start', sortable:true },
+        { text: 'Nombre Artículo', value: 'nombreArticulo', align:'start', sortable:true },
+        { text: 'Código', value: 'codigo', align:'start', sortable:true },
+        { text: 'Precio de Venta', value: 'precioVenta', align:'start' },
+        { text: 'Id Categoria', value: 'idCategoria', align:'start' },
         { text: 'Descripcion', value: 'descripcion',sortable:true },
+        { text: 'Stock', value: 'stock' },
         { text: 'Accion', value: 'actions', sortable: false },
       ],
   

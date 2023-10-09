@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,14 @@ namespace Entidades.Alamcen
 {
     public class Articulos
     {
+        [Key]
         public int IdArticulo { get; set; }
 
         [Required]
+        [ForeignKey("IdCategoria")]
         public int IdCategoria { get; set; }
 
-        public virtual Categoria? IdCategoriaNavigation{ get; set; }
+        public  Categoria IdCategoriaNavigation{ get; set; }
 
 
         [StringLength(50, MinimumLength = 3, ErrorMessage = "El código no debe de tener menos de 3 caracteres, ni más de 50")]
