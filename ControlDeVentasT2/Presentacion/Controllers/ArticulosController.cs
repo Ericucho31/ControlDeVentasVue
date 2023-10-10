@@ -176,7 +176,7 @@ namespace Presentacion.Controllers
 
         // METODO INSERTAR ROL//**********************************************************************************
         [HttpPost("[action]")]
-        public async Task<IActionResult> InsertarArticulo(InsertarArticuloViewModel modelArticulo)
+        public async Task<IActionResult> InsertarArticulos(InsertarArticuloViewModel modelArticulo)
         {
             if (_context.Articulos == null)
             {
@@ -236,6 +236,66 @@ namespace Presentacion.Controllers
 
             _context.Articulos.Remove(articulos);
             await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        //DESACTIVAR CATEGORIA//**********************************************************************************
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> DesactivarArticulos([FromRoute] int id)
+        {
+            if (id < 0)
+            {
+                return BadRequest();
+            }
+
+            var articulo = await _context.Articulos.FirstOrDefaultAsync(a => a.IdArticulo == id);
+
+            if (articulo == null)
+            {
+                return NotFound();
+            }
+
+            articulo.Estado = false;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
+        }
+
+        //ACTIVAR CATEGORIA//**********************************************************************************
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> ActivarArticulos([FromRoute] int id)
+        {
+            if (id < 0)
+            {
+                return BadRequest();
+            }
+
+            var articulo = await _context.Articulos.FirstOrDefaultAsync(a => a.IdArticulo == id);
+
+            if (articulo == null)
+            {
+                return NotFound();
+            }
+
+            articulo.Estado = true;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
 
             return NoContent();
         }
