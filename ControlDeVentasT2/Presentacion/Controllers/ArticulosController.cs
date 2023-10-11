@@ -174,7 +174,7 @@ namespace Presentacion.Controllers
             return NoContent();
         }
 
-        // METODO INSERTAR ROL//**********************************************************************************
+        // METODO INSERTAR ARTICULO//**********************************************************************************
         [HttpPost("[action]")]
         public async Task<IActionResult> InsertarArticulos(InsertarArticuloViewModel modelArticulo)
         {
