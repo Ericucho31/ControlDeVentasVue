@@ -15,6 +15,7 @@ namespace Presentacion.Models.Usuario.Usuarios
         public string Direccion { get; set; } = string.Empty;
         public string Telefono { get; set; } = string.Empty;
         [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
         [Required]
         public string Password { get; set; } = string.Empty; //Este dato es string porque se recibe desde ele frontend

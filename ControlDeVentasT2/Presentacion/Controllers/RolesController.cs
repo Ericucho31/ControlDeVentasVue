@@ -10,6 +10,8 @@ using Entidades.Usuarios;
 using Presentacion.Models.Almacen.Categoria;
 using Presentacion.Models.Usuario.Roles;
 using Entidades.Alamcen;
+using Presentacion.Models.Almacen.Articulos;
+using Presentacion.Models.Usuario.Usuarios;
 
 namespace Presentacion.Controllers
 {
@@ -22,6 +24,18 @@ namespace Presentacion.Controllers
         public RolesController(DBContextSistema context)
         {
             _context = context;
+        }
+
+        // METODO SELECCIONAR CATEGORIA  //**********************************************************************************
+        [HttpGet("[action]")]
+        public async Task<IEnumerable<SeleccionarUsuariosViewModel>> SeleccionarRol()
+        {
+            var rol = await _context.Roles.Where(a => a.Estado == true).ToArrayAsync();
+            return rol.Select(c => new SeleccionarUsuariosViewModel
+            {
+                IdRol = c.IdRol,
+                NombreRol = c.NombreRol,
+            });
         }
 
         // GET: api/Roles

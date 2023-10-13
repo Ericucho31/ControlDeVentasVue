@@ -95,7 +95,7 @@ namespace Presentacion.Controllers
             
 
             var email = modelUsuario.Email.ToUpper();
-            if (await _context.Usuarios.AnyAsync(u => u.Email == email))
+            if (await _context.Usuarios.AnyAsync(u => u.Email == email && u.IdUsuario != modelUsuario.IdUsuario))
             {
                 return BadRequest("El Email de este usuario ya existe"); //Función para validar que no se repita un Email
             }
@@ -256,6 +256,68 @@ namespace Presentacion.Controllers
 
             return NoContent();
         }
+
+        //DESACTIVAR CATEGORIA//**********************************************************************************
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> DesactivarUsuarios([FromRoute] int id)
+        {
+            if (id < 0)
+            {
+                return BadRequest();
+            }
+
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == id);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            usuario.Estado = false;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
+        }
+
+        //ACTIVAR CATEGORIA//**********************************************************************************
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> ActivarUsuarios([FromRoute] int id)
+        {
+            if (id < 0)
+            {
+                return BadRequest();
+            }
+
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == id);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            usuario.Estado = true;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return BadRequest();
+            }
+
+            return NoContent();
+        }
+
+
 
         private bool E_UsuariosExists(int id)
         {
