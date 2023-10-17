@@ -75,6 +75,7 @@ namespace Presentacion.Controllers
 
             return e_Usuarios;
         }
+       
 
         // METODO MODIFICAR USUARIO//**********************************************************************************
         [HttpPut("[action]")]

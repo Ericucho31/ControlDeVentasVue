@@ -19,6 +19,7 @@ namespace Datos
         public DbSet<Entidades.Usuarios.Roles> Roles { get; set; } = null!;
 
         public DbSet<Entidades.Usuarios.E_Usuarios> Usuarios { get; set; } = null!;
+        public DbSet<Entidades.Usuarios.Persona> Personas { get; set; } = null!;
 
         public DBContextSistema() { }
         public DBContextSistema(DbContextOptions options) : base(options)
@@ -36,6 +37,7 @@ namespace Datos
             modelBuilder.ApplyConfiguration(new RolesMap());
             modelBuilder.ApplyConfiguration(new ArticulosMap());
             modelBuilder.ApplyConfiguration(new UsuariosMap());
+            modelBuilder.ApplyConfiguration(new PersonaMap());
         }
     }
 }

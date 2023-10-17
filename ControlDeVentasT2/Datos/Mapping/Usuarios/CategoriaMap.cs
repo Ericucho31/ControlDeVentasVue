@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Datos.Mapping.Almacen
+namespace Datos.Mapping.Usuarios
 {
     public class CategoriaMap : IEntityTypeConfiguration<Categoria>
     {
