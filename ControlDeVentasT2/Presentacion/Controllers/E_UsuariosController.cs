@@ -11,6 +11,12 @@ using Entidades.Alamcen;
 using Presentacion.Models.Almacen.Articulos;
 using Presentacion.Models.Usuario.Usuarios;
 using Microsoft.AspNetCore.Identity;
+using System.Security.AccessControl;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.IdentityModel.JsonWebTokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Presentacion.Controllers
 {
@@ -19,10 +25,12 @@ namespace Presentacion.Controllers
     public class E_UsuariosController : ControllerBase
     {
         private readonly DBContextSistema _context;
+        private readonly IConfiguration _configuracion;
 
-        public E_UsuariosController(DBContextSistema context)
+        public E_UsuariosController(DBContextSistema context, IConfiguration configuracion)
         {
             _context = context;
+            _configuracion = configuracion;
         }
 
         // METODO LISTAR //**********************************************************************************
@@ -324,5 +332,60 @@ namespace Presentacion.Controllers
         {
             return (_context.Usuarios?.Any(e => e.IdUsuario == id)).GetValueOrDefault();
         }
+
+        private string GeneraToken(List<Claim> claims)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuracion["Jwt:key"]));
+            var credenciales = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                _configuracion["Jwt:Issuer"],
+                _configuracion["Jwt:Issuer"],
+                expires: DateTime.UtcNow.AddMinutes(30),
+                signingCredentials: credenciales,
+                claims: claims);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private bool VerificaPassword(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
+            {
+                var nuevoPasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return new ReadOnlySpan<byte>(passwordHash).SequenceEqual(new ReadOnlySpan<byte> ( nuevoPasswordHash ));
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Login (LoginViewModel model)
+        {
+            var email = model.Email.ToUpper();
+            var usuario = await _context.Usuarios.Where(u => u.Estado == true).Include(u => u.IdRolNavigation).FirstOrDefaultAsync(u => u.Email == email);
+
+            if(usuario == null) { return NotFound(); }
+
+            var IsValido = VerificaPassword(model.Password, usuario.PasswordHash, usuario.PasswordSalt);
+
+            if (!IsValido) { return BadRequest(); }
+
+            var claim = new List<Claim>
+            {
+                //Claim utilizadas en el Backend
+                new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, usuario.IdRolNavigation.NombreRol),
+
+                //Claim utilizadas en el frontend
+                new Claim("IdUsuario", usuario.IdUsuario.ToString()),
+                new Claim("Rol", usuario.IdRolNavigation.NombreRol),
+                new Claim("NombreUsuario", usuario.NombreUsuario)
+            };
+            return Ok(
+                new { token = GeneraToken(claim)}
+            );
+        }
+
+        
     }
 }
